@@ -5,21 +5,66 @@
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?" />
 <style>
 .center {
-  margin: 0;
+  margin: 40;
   position: absolute;
   top: 50%;
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  width: 8%;
+  width: 3%;
+}
+div.picwrapper {
+  margin: 0;
+  position: absolute;
+  top: 15%;
+  left: 9%;
+  width: 5%;
+  white-space: nowrap;
+}
+
+div.pic {
+    display:inline-block;
+}
+
+div.title {
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    color: black;
+    font-size: 4vw;
+}
+
+div.subtitle {
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    color: navy;
+    font-size: 2vw;
 }
 </style>
 </head>
-<body style="background-color:#000b34;">
+<body style="background-color:white;">
 
-<a href="https://www.linkedin.com/in/jamesy4/"> 
-  <img src="linkedin-logo.png" alt="Project Wander Logo" class="center"> 
-</a> 
+<div class="picwrapper">
+    <div class="title">
+        James Young
+    </div>
+    <div class="subtitle">
+        Stuyvesant High School 2017 | University of Chicago 2021
+    </div>
+    <br><br>
+
+    <div class="pic">  <a href="mailto:jamesyoungny@gmail.com"> 
+        <img src="email-logo.png" alt="Email"> 
+    </a></div>
+
+      <div class="pic">  <a href="https://github.com/jamesyoung4"> 
+        <img src="github-logo.png" alt="Github"> 
+    </a></div>
+
+    <div class="pic">  <a href="https://www.linkedin.com/in/jamesy4/"> 
+        <img src="linkedin-logo.png" alt="Linkedin"> 
+    </a></div>
+
+</div>
 
 </body>
 </html>

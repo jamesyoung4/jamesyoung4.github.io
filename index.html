@@ -11,7 +11,7 @@ html {
 }
 
 .bg {
-    background-image: url('background-pic.jpg');
+    background-color: navajowhite;
     background-repeat: no-repeat;
     background-position: right;
     background-size: cover;
@@ -28,12 +28,14 @@ div.links:hover {
 div.wrapper {
   margin: 0;
   position: absolute;
-  top: 15%;
-  left: 9%;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   white-space: nowrap;
 }
 
 div.pic {
+    text-align: center;
     display:inline-block;
 }
 
@@ -42,42 +44,33 @@ div.pic img:hover {
 }
 
 div.title {
-    text-align: left;
+    text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     color: black;
     font-size: 4vmax;
 }
 
 div.subtitle {
-    text-align: left;
+    text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     color: black;
     font-size: 1.2vmax;
 }
 
 div.footnote {
-    text-align: left;
+    text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     color:black;
     font-size: .5vmax;
 }
 
-div.handsomeman {
-    text-align: right
-}
 </style>
 
 </head>
 <body class="bg">
-    <div class="handsomeman">
-            <img src="logos/picanim2.gif" alt="James Young" style="width: 20vmax"> 
-    </div>
 
 <div class="wrapper">
-    <div class="title">  <a> 
-                <img src="logos/nameanim1.gif" alt="James Young" style="width: 35vmax"> 
-        </a>&nbsp;&nbsp;&nbsp;
-    </div>
+    
 
     
 <!--
@@ -92,29 +85,32 @@ div.handsomeman {
     <br>
 
     <div class="subtitle">
-        <b>Files:</b>
+        <a> 
+            <img src="logos/picanim2.gif" alt="James Young" style="width: 35vmax"> 
+        </a>&nbsp;&nbsp;&nbsp;
+
         <br>
         <div class="links">
             <a href="files/Young_James_Resume vF.pdf" target="_blank" style="text-decoration: none; color: grey;">Resume (Feb-21)</a>
         </div>     
-    </div>
 
-    <br><br>
-    <div class="pic">  <a href="mailto:jamesyoungny@gmail.com" target="_blank"> 
-        <img src="logos/email-logo.png" alt="Email" style="width: 2vmax"> 
-    </a></div>&nbsp;&nbsp;&nbsp;
+        <br><br>
+        <div class="pic">  <a href="mailto:jamesyoungny@gmail.com" target="_blank"> 
+            <img src="logos/email-logo.png" alt="Email" style="width: 2vmax"> 
+        </a></div>&nbsp;&nbsp;&nbsp;
 
-    <div class="pic">  <a href="https://github.com/jamesyoung4" target="_blank"> 
-        <img src="logos/github-logo.png" alt="Github" style="width: 2vmax"> 
-    </a></div>&nbsp;&nbsp;&nbsp;
+        <div class="pic">  <a href="https://github.com/jamesyoung4" target="_blank"> 
+            <img src="logos/github-logo.png" alt="Github" style="width: 2vmax"> 
+        </a></div>&nbsp;&nbsp;&nbsp;
 
-    <div class="pic">  <a href="https://www.linkedin.com/in/jamesy4/" target="_blank"> 
-        <img src="logos/linkedin-logo.png" alt="Linkedin" style="width: 2vmax"> 
-    </a></div>
-    <br><br>
+        <div class="pic">  <a href="https://www.linkedin.com/in/jamesy4/" target="_blank"> 
+            <img src="logos/linkedin-logo.png" alt="Linkedin" style="width: 2vmax"> 
+        </a></div>
+        <br><br>
 
-    <div class="footnote">
-        Last updated: February 2021
+        <div class="footnote">
+            Last updated: February 2021
+        </div>
     </div>
 </div>
 

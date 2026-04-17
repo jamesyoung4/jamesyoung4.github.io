@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>James Young</title>
+<meta name="description" content="James Young" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: #070818;
+    --bg-1: #0f1230;
+    --ink: #ecefff;
+    --ink-soft: #b8bde0;
+    --ink-muted: #7a7fa8;
+    --accent: #a8b5ff;
+
+    --serif: "EB Garamond", Garamond, "Adobe Garamond Pro", "Apple Garamond", Georgia, "Times New Roman", serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 100% 70% at 50% 50%, var(--bg-1) 0%, var(--bg-0) 75%),
+      var(--bg-0);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    display: grid;
+    place-items: center;
+    padding: 48px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+  }
+
+  /* Slight center darkening so text stays readable over the busy horizon */
+  .veil {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 48% 32% at 50% 50%, rgba(7, 8, 24, 0.72) 0%, rgba(7, 8, 24, 0) 72%);
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.1;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .card {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 560px;
+    display: grid;
+    gap: 40px;
+  }
+
+  .name {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(3rem, 9vw, 5.25rem);
+    letter-spacing: -0.015em;
+    line-height: 1;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .tagline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-soft);
+    font-size: 1.25rem;
+    margin: 18px 0 4px;
+    letter-spacing: 0.005em;
+  }
+
+  .location {
+    font-family: var(--serif);
+    font-weight: 500;
+    color: var(--ink-muted);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.26em;
+    margin: 0;
+  }
+
+  .links { display: flex; align-items: center; }
+
+  .link-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 9px;
+    margin-left: -9px;
+    border-radius: 8px;
+    color: var(--ink-soft);
+    transition: color 200ms ease, background-color 200ms ease, transform 200ms ease;
+  }
+
+  .link-icon:hover {
+    color: var(--accent);
+    background-color: color-mix(in srgb, var(--accent) 14%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .link-icon svg { width: 22px; height: 22px; fill: currentColor; display: block; }
+
+  ::selection { background: var(--accent); color: var(--bg-0); }
+
+  @media (min-width: 720px) { .card { gap: 52px; } }
+</style>
+</head>
+<body>
+  <canvas id="field" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <main class="card">
+    <header>
+      <h1 class="name">James Young</h1>
+      <p class="tagline">Healthcare &amp; Technology Investor</p>
+      <p class="location">New York</p>
+    </header>
+
+    <nav class="links" aria-label="Links">
+      <a class="link-icon" href="https://www.linkedin.com/in/jamesy4/" rel="me" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+      </a>
+    </nav>
+  </main>
+
+<script>
+(function () {
+  const canvas = document.getElementById("field");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  let W = 0, H = 0;
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const COLS = 95;
+  const ROWS = 45;
+
+  const pulses = [];
+  let nextPulse = 1.5;
+
+  let mX = W / 2, mY = H * 0.6;
+  let tX = mX, tY = mY;
+  let mActive = false;
+  let prevX = mX, prevY = mY;
+  let lastMousePulse = 0;
+
+  window.addEventListener("pointermove", function (e) {
+    tX = e.clientX; tY = e.clientY; mActive = true;
+  }, { passive: true });
+  window.addEventListener("pointerleave", function () { mActive = false; });
+  window.addEventListener("blur", function () { mActive = false; });
+
+  function surfaceH(c, r, t, gc, gr, mStrength) {
+    const x = (c - COLS / 2) * 0.18;
+    const z = r * 0.22;
+
+    let h =
+      Math.sin(x * 0.55 + t * 0.55) * 0.55 +
+      Math.cos(z * 0.65 - t * 0.42) * 0.55 +
+      Math.sin((x + z) * 0.35 + t * 0.6) * 0.35 +
+      Math.sin(x * 1.1 - z * 0.7 + t * 0.8) * 0.22 +
+      Math.cos((x * 0.4 + z * 0.9) + t * 0.25) * 0.28;
+
+    for (let i = 0; i < pulses.length; i++) {
+      const p = pulses[i];
+      const age = t - p.t0;
+      if (age < 0 || age > p.life) continue;
+      const dx = c - p.c;
+      const dz = r - p.r;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      const wave = Math.sin(age * 6 - d * 0.35);
+      const falloff = Math.exp(-age * 0.9) * Math.exp(-Math.max(0, d - age * 5) * 0.25);
+      h += wave * falloff * p.amp;
+    }
+
+    if (mStrength > 0 && gc > -900) {
+      const dx = c - gc;
+      const dz = r - gr;
+      const d2 = dx * dx + dz * dz * 2.2;
+      h += Math.exp(-d2 / 55) * 1.6 * mStrength;
+    }
+
+    return h;
+  }
+
+  // Each plane is defined by its horizon point (hx, hy), a forward unit vector
+  // (fx, fy) pointing from horizon to near edge, the forward length, a
+  // perpendicular side unit vector (sx, sy), and the near-edge half-width.
+  function makePlane(hx, hy, fx, fy, fwdLen, sx, sy, halfWLen) {
+    return { hx, hy, fx, fy, fwdLen, sx, sy, halfWLen };
+  }
+
+  function invertToGrid(mx, my, P) {
+    const rx = mx - P.hx, ry = my - P.hy;
+    const fwd = rx * P.fx + ry * P.fy;
+    if (fwd <= 0) return null;
+    const depthM = Math.max(0.001, Math.min(1, fwd / P.fwdLen));
+    const gr = (ROWS - 1) * Math.pow(depthM, 1 / 1.7);
+    const halfAt = P.halfWLen * (0.08 + depthM * 0.92);
+    const side = rx * P.sx + ry * P.sy;
+    const relC = side / (2 * halfAt);
+    const gc = (relC + 0.5) * (COLS - 1);
+    return { gc, gr };
+  }
+
+  function drawPlane(P, t, cursor) {
+    const gc = cursor ? cursor.gc : -999;
+    const gr = cursor ? cursor.gr : -999;
+    const mStrength = cursor ? 1 : 0;
+
+    for (let r = 0; r < ROWS; r++) {
+      const tt = r / (ROWS - 1);
+      const depth = Math.pow(tt, 1.7);
+      const fwd = depth * P.fwdLen;
+      const halfSide = P.halfWLen * (0.08 + depth * 0.92);
+      const vAmp = 6 + depth * 48;
+      const alpha = 0.08 + depth * 0.82;
+      const size = 0.45 + depth * 1.55;
+
+      for (let c = 0; c < COLS; c++) {
+        const s = ((c / (COLS - 1)) - 0.5) * 2 * halfSide;
+        const h = surfaceH(c, r, t, gc, gr, mStrength);
+        // crests bulge back toward horizon (along -forward)
+        const fAdj = fwd - h * vAmp;
+        const cx = P.hx + fAdj * P.fx + s * P.sx;
+        const cy = P.hy + fAdj * P.fy + s * P.sy;
+
+        const hi = Math.max(0, Math.min(1, (h + 1) / 2.2));
+        const rC = Math.round(168 + (210 - 168) * hi);
+        const gC = Math.round(181 + (200 - 181) * hi);
+        const bC = 255;
+
+        ctx.globalAlpha = alpha * (0.55 + 0.45 * hi);
+        ctx.fillStyle = "rgb(" + rC + "," + gC + "," + bC + ")";
+        ctx.beginPath();
+        ctx.arc(cx, cy, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function frame(tMs) {
+    const t = tMs / 1000;
+
+    mX += (tX - mX) * 0.16;
+    mY += (tY - mY) * 0.16;
+    const vx = mX - prevX, vy = mY - prevY;
+    const speed = Math.hypot(vx, vy);
+    prevX = mX; prevY = mY;
+
+    if (t > nextPulse) {
+      pulses.push({
+        c: Math.random() * COLS,
+        r: Math.random() * ROWS,
+        t0: t, amp: 0.9 + Math.random() * 1.2, life: 3.5,
+      });
+      nextPulse = t + 1.8 + Math.random() * 3.2;
+    }
+
+    const cx = W / 2;
+    const cy = H * 0.5;
+    const hLen = H * 0.62;   // vertical plane depth
+    const wLen = W * 0.62;   // horizontal plane depth
+    const hHalf = W * 0.72;  // horizontal half-width for top/bottom near edges
+    const vHalf = H * 0.72;  // vertical half-width for left/right near edges
+
+    // 4 planes radiating from the center horizon point
+    const floor   = makePlane(cx, cy,  0,  1, hLen,  1,  0, hHalf);
+    const ceiling = makePlane(cx, cy,  0, -1, hLen,  1,  0, hHalf);
+    const left    = makePlane(cx, cy, -1,  0, wLen,  0,  1, vHalf);
+    const right   = makePlane(cx, cy,  1,  0, wLen,  0,  1, vHalf);
+    const planes = [floor, ceiling, left, right];
+
+    // cursor-per-plane
+    const cursors = new Array(planes.length);
+    let firstHit = null;
+    if (mActive) {
+      for (let i = 0; i < planes.length; i++) {
+        cursors[i] = invertToGrid(mX, mY, planes[i]);
+        if (cursors[i] && !firstHit) firstHit = cursors[i];
+      }
+      if (firstHit && speed > 9 && t - lastMousePulse > 0.13) {
+        pulses.push({
+          c: firstHit.gc, r: firstHit.gr, t0: t,
+          amp: Math.min(2.4, 0.5 + speed * 0.05),
+          life: 2.6,
+        });
+        lastMousePulse = t;
+      }
+    }
+
+    for (let i = pulses.length - 1; i >= 0; i--) {
+      if (t - pulses[i].t0 > pulses[i].life) pulses.splice(i, 1);
+    }
+
+    ctx.clearRect(0, 0, W, H);
+
+    for (let i = 0; i < planes.length; i++) {
+      drawPlane(planes[i], t, cursors[i]);
+    }
+
+    ctx.globalAlpha = 1;
+
+    if (!reduce) requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

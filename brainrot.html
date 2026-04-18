@@ -40,8 +40,10 @@
     z-index: 10;
     display: inline-flex; align-items: center; gap: 0.5rem;
     padding: 8px 12px; border-radius: 8px;
-    color: var(--ink-muted);
+    color: #ffffff;
+    font-family: var(--serif);
     font-style: italic;
+    font-size: 1rem;
     text-decoration: none;
     transition: color 200ms ease, background-color 200ms ease;
   }
@@ -93,7 +95,8 @@
     left: 50%;
     bottom: 56px;
     transform: translateX(-50%);
-    color: var(--ink-muted);
+    color: #ffffff;
+    font-family: var(--serif);
     font-style: italic;
     font-size: 1rem;
     letter-spacing: 0.01em;
@@ -130,7 +133,19 @@ function hideAudioHint() {
 }
 
 let startAnimation = null;
+let resetAnim = null;
 let started = false;
+
+function showHint(text) {
+  const h = document.getElementById('audio-hint');
+  if (h) { h.textContent = text; h.style.opacity = '1'; }
+}
+
+function bindStart() {
+  ['pointerdown', 'click', 'keydown', 'touchstart'].forEach(evt =>
+    document.addEventListener(evt, startExperience, { once: true, passive: true })
+  );
+}
 
 function startExperience() {
   if (started) return;
@@ -151,9 +166,19 @@ function startExperience() {
 
   if (startAnimation) startAnimation();
 }
-['pointerdown', 'click', 'keydown', 'touchstart'].forEach(evt =>
-  document.addEventListener(evt, startExperience, { once: true, passive: true })
-);
+
+function endRound() {
+  brainrotStopped = true;
+  if (brainrotRaf) { cancelAnimationFrame(brainrotRaf); brainrotRaf = 0; }
+  clearTimeout(idleTimer);
+  try { oppaAudio.pause(); oppaAudio.currentTime = 0; oppaAudio.muted = true; } catch (_) {}
+  if (resetAnim) resetAnim();
+  started = false;
+  showHint('click to play again');
+  bindStart();
+}
+
+bindStart();
 
 let idleTimer = null;
 function playHitSound() {
@@ -190,7 +215,8 @@ let brainrotRaf = 0;
   const initialR = 185 * SCALE, minR = 26 * SCALE, ballR = 10 * SCALE;
   const startSpeed = 2.4 * SCALE, shrink = 1.4 * SCALE;
   const GRAVITY = 0.14 * SCALE, MAX_SPEED = 8.5 * SCALE;
-  const RESTITUTION = 1.05, TANGENT_KICK = 1.1 * SCALE, MIN_BOUNCE_SPEED = 2.6 * SCALE;
+  const RESTITUTION = 1.05, TANGENT_KICK = 0.7 * SCALE, MIN_BOUNCE_SPEED = 2.6 * SCALE;
+  const MIN_INWARD_SPEED = 2.0 * SCALE; // keeps the ball from skimming the edge
 
   // Blue hue cycle — starts at 220 (pure blue) and drifts toward periwinkle/violet.
   let outerR = initialR;
@@ -214,6 +240,8 @@ let brainrotRaf = 0;
     vx = Math.cos(a2) * startSpeed; vy = Math.sin(a2) * startSpeed;
     x = cx; y = cy;
     trail.length = 0;
+    particles.length = 0;
+    flash = 0;
   }
 
   function clampSpeed() {
@@ -233,6 +261,14 @@ let brainrotRaf = 0;
       const tx = -ny, ty = nx;
       const k = (Math.random() - 0.5) * 2 * TANGENT_KICK;
       vx += tx * k; vy += ty * k;
+
+      // enforce a minimum inward component so the ball doesn't skim the edge
+      const inward = -(vx * nx + vy * ny);
+      if (inward < MIN_INWARD_SPEED) {
+        const deficit = MIN_INWARD_SPEED - inward;
+        vx -= nx * deficit; vy -= ny * deficit;
+      }
+
       const s = Math.hypot(vx, vy);
       if (s < MIN_BOUNCE_SPEED) {
         const sc = MIN_BOUNCE_SPEED / (s || 1);
@@ -247,7 +283,7 @@ let brainrotRaf = 0;
       hue = 200 + ((hue - 200 + 8) % 60);
       spawnParticles();
       playHitSound();
-      if (outerR <= minR) reset();
+      if (outerR <= minR) { endRound(); return; }
     }
     flash *= 0.88;
 
@@ -335,7 +371,14 @@ let brainrotRaf = 0;
     ctx.restore();
   }
   renderStatic();
-  startAnimation = frame;
+  startAnimation = function () {
+    brainrotStopped = false;
+    frame();
+  };
+  resetAnim = function () {
+    reset();
+    renderStatic();
+  };
 })();
 </script>
 </body>

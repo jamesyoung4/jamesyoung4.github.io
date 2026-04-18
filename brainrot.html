@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brainrot — James Young</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23070818'/><text x='50%25' y='54%25' text-anchor='middle' dominant-baseline='central' font-family='Helvetica Neue, Helvetica, Arial, sans-serif' font-weight='500' font-size='30' letter-spacing='-1' fill='%23a8b5ff'>JY</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-0: #070818;
+    --bg-1: #0f1230;
+    --ink: #ecefff;
+    --ink-soft: #b8bde0;
+    --ink-muted: #7a7fa8;
+    --accent: #a8b5ff;
+    --serif: "EB Garamond", Garamond, "Adobe Garamond Pro", "Apple Garamond", Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 100% 70% at 50% 50%, var(--bg-1) 0%, var(--bg-0) 75%),
+      var(--bg-0);
+    color: var(--ink);
+    font-family: var(--serif);
+    display: grid;
+    place-items: center;
+    padding: 48px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .back {
+    position: fixed; top: 24px; left: 24px;
+    z-index: 10;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 8px 12px; border-radius: 8px;
+    color: var(--ink-muted);
+    font-style: italic;
+    text-decoration: none;
+    transition: color 200ms ease, background-color 200ms ease;
+  }
+  .back:hover {
+    color: var(--accent);
+    background-color: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  /* Wrapper around the canvas hosts the rotating aura. Wrap does NOT clip —
+     the aura extends past the wrap and gets clipped by body's overflow:hidden. */
+  .brainrot-wrap {
+    position: relative;
+    width: min(480px, 90vw); height: min(480px, 90vw);
+    display: flex; align-items: center; justify-content: center;
+    overflow: visible;
+  }
+  .brainrot-wrap::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 2400px; height: 2400px;
+    margin-left: -1200px; margin-top: -1200px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 180deg at 50% 50%,
+      transparent 0deg,
+      rgba(168, 181, 255, 0.22) 60deg,
+      rgba(198, 208, 255, 0.12) 120deg,
+      transparent 180deg,
+      rgba(122, 127, 168, 0.16) 240deg,
+      rgba(90, 130, 220, 0.10) 300deg,
+      transparent 360deg
+    );
+    animation: aura-spin 14s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes aura-spin { to { transform: rotate(360deg); } }
+
+  canvas.brainrot {
+    position: relative;
+    z-index: 2;
+    width: 100%; height: 100%;
+    display: block;
+  }
+
+  .hint {
+    position: fixed;
+    left: 50%;
+    bottom: 56px;
+    transform: translateX(-50%);
+    color: var(--ink-muted);
+    font-style: italic;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    z-index: 5;
+    transition: opacity 300ms ease;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg-0); }
+</style>
+</head>
+<body>
+  <a class="back" href="index.html" aria-label="Back home">← back</a>
+
+  <div class="brainrot-wrap">
+    <canvas class="brainrot" id="brainrot"></canvas>
+  </div>
+
+  <div class="hint" id="audio-hint">click anywhere to start</div>
+
+<script>
+// ============================================================================
+// Gangnam Style audio — muted-primed, unmuted on first user click.
+// ============================================================================
+const OPPA_URL = 'gangnam-style.m4a';
+const IDLE_PAUSE_MS = 600;
+
+const oppaAudio = new Audio(OPPA_URL);
+oppaAudio.preload = 'auto';
+oppaAudio.volume = 0.9;
+
+function hideAudioHint() {
+  const h = document.getElementById('audio-hint');
+  if (h) h.style.opacity = '0';
+}
+
+let startAnimation = null;
+let started = false;
+
+function startExperience() {
+  if (started) return;
+  started = true;
+  hideAudioHint();
+
+  // Prime audio: muted play → pause → unmute. The click IS the gesture, so
+  // after this subsequent .play() calls on bounce are allowed.
+  oppaAudio.muted = true;
+  const p = oppaAudio.play();
+  if (p && p.then) {
+    p.then(() => {
+      oppaAudio.pause();
+      oppaAudio.currentTime = 0;
+      oppaAudio.muted = false;
+    }).catch(() => { oppaAudio.muted = false; });
+  }
+
+  if (startAnimation) startAnimation();
+}
+['pointerdown', 'click', 'keydown', 'touchstart'].forEach(evt =>
+  document.addEventListener(evt, startExperience, { once: true, passive: true })
+);
+
+let idleTimer = null;
+function playHitSound() {
+  if (brainrotStopped) return;
+  const needsKickoff = oppaAudio.muted || oppaAudio.paused || oppaAudio.ended;
+  if (needsKickoff) {
+    oppaAudio.muted = false;
+    oppaAudio.currentTime = 0;
+    oppaAudio.play().catch(() => {});
+  }
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    try { oppaAudio.pause(); oppaAudio.currentTime = 0; } catch (_) {}
+  }, IDLE_PAUSE_MS);
+}
+
+// ============================================================================
+// Animation — blue-themed ball bouncing in a shrinking circle.
+// ============================================================================
+let brainrotStopped = false;
+let brainrotRaf = 0;
+
+(() => {
+  const canvas = document.getElementById('brainrot');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const CSS_W = canvas.clientWidth || 400, CSS_H = canvas.clientHeight || 400;
+  canvas.width = CSS_W * dpr; canvas.height = CSS_H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const cx = CSS_W / 2, cy = CSS_H / 2;
+  const SCALE = Math.min(CSS_W, CSS_H) / 400;
+  const initialR = 185 * SCALE, minR = 26 * SCALE, ballR = 10 * SCALE;
+  const startSpeed = 2.4 * SCALE, shrink = 1.4 * SCALE;
+  const GRAVITY = 0.14 * SCALE, MAX_SPEED = 8.5 * SCALE;
+  const RESTITUTION = 1.05, TANGENT_KICK = 1.1 * SCALE, MIN_BOUNCE_SPEED = 2.6 * SCALE;
+
+  // Blue hue cycle — starts at 220 (pure blue) and drifts toward periwinkle/violet.
+  let outerR = initialR;
+  let x = cx, y = cy;
+  let a0 = Math.random() * Math.PI * 2;
+  let vx = Math.cos(a0) * startSpeed, vy = Math.sin(a0) * startSpeed;
+  let flash = 0, hue = 220;
+  const trail = [], particles = [];
+
+  function spawnParticles() {
+    for (let i = 0; i < 14; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const sp = (1.2 + Math.random() * 3.0) * SCALE;
+      particles.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: 1.0 });
+    }
+  }
+
+  function reset() {
+    outerR = initialR; hue = 220;
+    const a2 = Math.random() * Math.PI * 2;
+    vx = Math.cos(a2) * startSpeed; vy = Math.sin(a2) * startSpeed;
+    x = cx; y = cy;
+    trail.length = 0;
+  }
+
+  function clampSpeed() {
+    const s = Math.hypot(vx, vy);
+    if (s > MAX_SPEED) { vx = (vx / s) * MAX_SPEED; vy = (vy / s) * MAX_SPEED; }
+  }
+
+  function frame() {
+    vy += GRAVITY; clampSpeed();
+    x += vx; y += vy;
+    const dx = x - cx, dy = y - cy, d = Math.hypot(dx, dy);
+    if (d + ballR >= outerR) {
+      const nx = dx / d, ny = dy / d;
+      const vdotn = vx * nx + vy * ny;
+      vx -= 2 * vdotn * nx; vy -= 2 * vdotn * ny;
+      vx *= RESTITUTION; vy *= RESTITUTION;
+      const tx = -ny, ty = nx;
+      const k = (Math.random() - 0.5) * 2 * TANGENT_KICK;
+      vx += tx * k; vy += ty * k;
+      const s = Math.hypot(vx, vy);
+      if (s < MIN_BOUNCE_SPEED) {
+        const sc = MIN_BOUNCE_SPEED / (s || 1);
+        vx *= sc; vy *= sc;
+      }
+      clampSpeed();
+      const over = (d + ballR) - outerR;
+      x -= nx * (over + 0.5); y -= ny * (over + 0.5);
+      outerR -= shrink;
+      flash = 1;
+      // narrow cycle: 200–260 keeps everything in the blue-violet band
+      hue = 200 + ((hue - 200 + 8) % 60);
+      spawnParticles();
+      playHitSound();
+      if (outerR <= minR) reset();
+    }
+    flash *= 0.88;
+
+    trail.push({x, y});
+    if (trail.length > 22) trail.shift();
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy;
+      p.vx *= 0.94; p.vy *= 0.94;
+      p.life -= 0.035;
+    }
+    while (particles.length && particles[0].life <= 0) particles.shift();
+
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+
+    // outer arena ring — blue glow
+    const glowA = 0.25 + flash * 0.5;
+    ctx.save();
+    ctx.shadowColor = `hsla(${hue}, 90%, 72%, ${glowA})`;
+    ctx.shadowBlur = 18 + flash * 22;
+    ctx.strokeStyle = `hsla(${hue}, 90%, 75%, ${0.55 + flash * 0.45})`;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
+    // trail — periwinkle
+    for (let i = 0; i < trail.length; i++) {
+      const t = trail[i]; const f = i / trail.length;
+      ctx.fillStyle = `rgba(168, 181, 255, ${f * 0.45})`;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, ballR * f, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // particles — blue sparks
+    for (const p of particles) {
+      ctx.fillStyle = `hsla(${hue}, 90%, 75%, ${p.life * 0.9})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2.2 * p.life, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ball — white core, periwinkle mid, deep blue outer
+    ctx.save();
+    ctx.shadowColor = 'rgba(168, 181, 255, 0.85)';
+    ctx.shadowBlur = 20;
+    const g = ctx.createRadialGradient(x - 3, y - 3, 0, x, y, ballR);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(0.35, '#c6d0ff');
+    g.addColorStop(1, '#a8b5ff');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, ballR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    if (!brainrotStopped) brainrotRaf = requestAnimationFrame(frame);
+  }
+
+  // Static initial render: ring + resting ball, so the user sees the scene
+  // ready to go before they click.
+  function renderStatic() {
+    ctx.clearRect(0, 0, CSS_W, CSS_H);
+    ctx.save();
+    ctx.shadowColor = `hsla(${hue}, 90%, 72%, 0.25)`;
+    ctx.shadowBlur = 18;
+    ctx.strokeStyle = `hsla(${hue}, 90%, 75%, 0.55)`;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(168, 181, 255, 0.85)';
+    ctx.shadowBlur = 20;
+    const g = ctx.createRadialGradient(x - 3, y - 3, 0, x, y, ballR);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(0.35, '#c6d0ff');
+    g.addColorStop(1, '#a8b5ff');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, ballR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  renderStatic();
+  startAnimation = frame;
+})();
+</script>
+</body>
+</html>
